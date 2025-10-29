@@ -3,7 +3,7 @@ import { User } from "@/type";
 
 async function getUsers(search = "", page = 1): Promise<User[]> {
   const res = await fetch(
-    `http://localhost:3000/api/users?results=10&page=${page}`,
+    `http://localhost:3001/api/users?results=10&page=${page}`,
     { cache: "no-store" }
   );
 
@@ -36,7 +36,7 @@ export default async function Home(props: {
 
   return (
     <main className="p-8 bg-white text-gray-600 min-h-screen">
-      <h1 className="text-2xl font-bold mb-6">Daftar Pengguna</h1>
+      <h1 className="text-2xl font-bold mb-6">List</h1>
       <UsersTable users={users} currentPage={page} search={search} />
     </main>
   );
