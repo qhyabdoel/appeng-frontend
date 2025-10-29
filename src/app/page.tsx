@@ -1,39 +1,43 @@
 import UsersTable from "@/components/UsersTable";
 import { User } from "@/type";
 
-async function getUsers(search: string = "") {
-  const res = await fetch(`http://localhost:3000/api/users?results=20&page=1`, {
-    cache: "no-store", // Always fetch fresh data
-  });
-
-  // Handle fetch errors
-  if (!res.ok) {
-    console.log({ res });
-    throw new Error("Failed to fetch users");
-  }
+async function getUsers(search = "", page = 1): Promise<User[]> {
+  const res = await fetch(
+    `http://localhost:3000/api/users?results=10&page=${page}`,
+    { cache: "no-store" }
+  );
 
   const data = await res.json();
+  const users: User[] = data.users;
 
-  if (!search) return data.users;
+  if (!search) return users;
 
-  // Filter data on the server component side
-  return data.users.filter((u: User) =>
-    u.name.toLowerCase().includes(search.toLowerCase())
-  );
+  return users.filter((u) => {
+    const query = search.toLowerCase();
+    return (
+      u.name.toLowerCase().includes(query) ||
+      u.location.toLowerCase().includes(query) ||
+      u.email.toLowerCase().includes(query) ||
+      u.phone.toLowerCase().includes(query) ||
+      u.cell.toLowerCase().includes(query) ||
+      u.age.toString().includes(query)
+    );
+  });
 }
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: { q?: string };
+export default async function Home(props: {
+  searchParams: Promise<{ q?: string; page?: string }>;
 }) {
+  const searchParams = await props.searchParams;
   const search = searchParams.q || "";
-  const users = await getUsers(search);
+  const page = Number(searchParams.page) || 1;
+
+  const users = await getUsers(search, page);
 
   return (
-    <main className="p-8 bg-white text-gray-600">
+    <main className="p-8 bg-white text-gray-600 min-h-screen">
       <h1 className="text-2xl font-bold mb-6">Daftar Pengguna</h1>
-      <UsersTable users={users} />
+      <UsersTable users={users} currentPage={page} search={search} />
     </main>
   );
 }

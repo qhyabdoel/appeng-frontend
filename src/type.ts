@@ -7,3 +7,14 @@ export interface User {
   cell: string;
   picture: string[];
 }
+
+export interface UserTableProps {
+  users: User[];
+  currentPage: number;
+  search: string;
+}
+
+export interface SearchParams {
+  q?: string;
+  page?: string;
+}
